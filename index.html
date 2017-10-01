@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TodoApp</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./styles/style.css">
+  <script src="./scripts/persistence.js"></script>
+  <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+
+  <div id="TodoApp" v-cloak>
+
+    <section id="title">
+      <h1>Todo app</h1>
+    </section>
+
+    <section id="todo-creator">
+      <label for="todo-creator-textBox">Todo title</label>
+      <input v-model="newTodoTitle" type="text" id="todo-creator-textBox" />
+      <button v-on:click="addTodo">Create</button>
+    </section>
+
+    <section v-if="todoCount > 0">
+      <h2>Todos</h2>
+      <div v-for="todo in todos">
+        <span>{{todo.title}}</span> <input type="checkbox" v-model="todo.done" />
+      </div>
+    </section>
+    <section v-else>
+      <h2>There are no todos for today (:</h2>
+    </section>
+
+    <section v-if="pendingCount > 0">
+      <h2>Pending todos</h2>
+      <ul>
+        <li v-for="pending in pending">
+          {{pending.title}}
+        </li>
+      </ul>
+    </section>
+
+    <section v-if="completedCount > 0">
+      <h2>Completed todos</h2>
+      <li v-for="complete in completed">
+        {{complete.title}} <button v-on:click="removeTodo(complete)">Remove</button>
+      </li>
+    </section>
+
+  </div>
+
+  <script type="text/javascript">
+    const TODO_PERSISTENCE_KEY = 'TodoApp-Simple-Todos'
+    var app = new Vue({
+      el: '#TodoApp',
+      data: function () {
+        return {
+          newTodoTitle: '',
+          todos: []
+        }
+      },
+      beforeMount: function () {
+        let todos = LocalStoragePersistence.loadJsonObject(TODO_PERSISTENCE_KEY)
+        this.todos = todos === null ? [] : todos 
+      },
+      computed: {
+        todoCount: function () { 
+          return this.todos.length 
+        },
+        completed: function () { 
+          return this.todos.filter(function (todo) { 
+            return todo.done 
+          }) 
+        },
+        completedCount: function () { 
+          return this.completed.length 
+        },
+        pending: function () { 
+          return this.todos.filter(function (todo) { 
+            return !todo.done 
+          }) 
+        },
+        pendingCount: function () { 
+          return this.pending.length 
+        }
+      },
+      methods: {
+        addTodo: function () { 
+          this.todos.push({ title: this.newTodoTitle, done: false }) 
+          LocalStoragePersistence.saveJsonObject(TODO_PERSISTENCE_KEY, this.todos)
+        },
+        removeTodo: function (todo) { 
+          this.todos.splice(this.todos.indexOf(todo), 1) 
+          LocalStoragePersistence.saveJsonObject(TODO_PERSISTENCE_KEY, this.todos)
+        }
+      }
+    });
+  </script>
+</body>
+</html>
