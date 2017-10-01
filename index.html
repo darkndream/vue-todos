@@ -16,14 +16,25 @@
       <h1>Todo app</h1>
     </section>
 
-    <section id="todo-creator">
-      <label for="todo-creator-textBox">Todo title</label>
-      <input v-model="newTodoTitle" type="text" id="todo-creator-textBox" />
+    <!--
+      Here is our todo title creation box
+    -->
+    <section>
+      <label for="newTodo-textbox">Todo title</label>
+      <input type="text" id="newTodo-textbox" v-model="newTodoTitle" />
       <button v-on:click="addTodo">Create</button>
     </section>
 
+    <!-- 
+      Show our todos, if present, otherwise show a friendly message.
+    -->
     <section v-if="todoCount > 0">
       <h2>Todos</h2>
+      <!-- 
+        Let's iterate over our todo's,
+        bind their done values to a checkbox input
+        to allow the user to modify the status of the todos
+      -->
       <div v-for="todo in todos">
         <span>{{todo.title}}</span> <input type="checkbox" v-model="todo.done" />
       </div>
@@ -32,18 +43,32 @@
       <h2>There are no todos for today (:</h2>
     </section>
 
+    <!--
+      Let's use a computed variable to conditional-render our pending todos
+    -->
     <section v-if="pendingCount > 0">
       <h2>Pending todos</h2>
       <ul>
+        <!-- 
+          Use a computed variable to cache our pending todos and render them
+        -->
         <li v-for="pending in pending">
           {{pending.title}}
         </li>
       </ul>
     </section>
 
+    <!--
+      Let's use a computed variable to conditional-render our completed todos
+    -->
     <section v-if="completedCount > 0">
       <h2>Completed todos</h2>
       <li v-for="complete in completed">
+        <!-- 
+          Use a computed variable to cache our completed todos and render them,
+          added a button binded to the removeTodo method with our current iterating
+          todo to allow us to remove it later.
+        -->
         {{complete.title}} <button v-on:click="removeTodo(complete)">Remove</button>
       </li>
     </section>
@@ -51,7 +76,13 @@
   </div>
 
   <script type="text/javascript">
+    /**
+     * @constant { string } TODO_PERSISTENCE_KEY Key used to store our data in localStorage
+    */
     const TODO_PERSISTENCE_KEY = 'TodoApp-Simple-Todos'
+    /**
+     * Most of the code here is self-explainatory
+    */
     var app = new Vue({
       el: '#TodoApp',
       data: function () {
